@@ -51,17 +51,17 @@ editor_options:
             file, which contains the machine code for the functions
             defined in that file
         -   indicated by the `-c` flag
-    -   Benefits:
-        -   smaller, more manageable modules
-        -   you only need to recompile that file and relink the object
-            files
-        -   Object files can be reused
-    -   Example:
+        -   Benefits:
+            -   smaller, more manageable modules
+            -   you only need to recompile that file and relink the
+                object files
+            -   Object files can be reused
+        -   Example:
 
 ```         
-        gcc -O3 -ffast-math -mavx2 -c -o cpi.o cpi.c 
-        gcc -O3 -ffast-math -mavx2 -c -o gettime.o gettime.c 
-        gcc -O3 -ffast-math -mavx2 -o cpi cpi.o gettime.o
+          gcc -O3 -ffast-math -mavx2 -c -o cpi.o cpi.c 
+          gcc -O3 -ffast-math -mavx2 -c -o gettime.o gettime.c 
+          gcc -O3 -o cpi cpi.o gettime.o
 ```
 
 -   Importance of compiler optimization and how can affect the results.
@@ -75,16 +75,25 @@ editor_options:
 
 ```         
       CFLAGS=-O3 -ffast-math -mavx2 
-      CC=cc
+      CC=gcc
       
-      sum : sum.o getTime.o
+      cpi : cpi.o gettime.o
       
-      sum.o : sum.c getTime.h
+      cpi.o : cpi.c gettime.h
       
-      getTime.o: getTime.c getTime.h
+      gettime.o: gettime.c gettime.h
       
       clean:
-        rm -f sum sum.o getTime.o
+        rm -f cpi cpi.o gettime.o
+```
+
+Then:
+
+```         
+        make
+        gcc -O3 -ffast-math -mavx2 -c -o cpi.o cpi.c 
+        gcc -O3 -ffast-math -mavx2 -c -o gettime.o gettime.c 
+        gcc -o cpi cpi.o gettime.o
 ```
 
 -   Purpose and function of batch queue systems (e.g. SLURM).
@@ -157,6 +166,9 @@ editor_options:
         comparison operator
     -   `if [ $A -gt 10]; then echo large; fi` - conditional expressions
     -   `if [[ $A -gt 10 ]]; then echo large; fi` - string comparison
+-   For Loop:
+    -   `for V in a b c; do echo $V; done`
+    -   `for (( i=0; i<10; ++i)); do echo $i; done`
 -   Shift:
 
 ```         
@@ -298,6 +310,10 @@ editor_options:
 ## OpenMP
 
 -   OpenMP uses a shared memory paradigm
+    -   Open MP is a multithread model, within a single process.
+        Communications between threads are implicit. The management of
+        communications is under the responsibility of the compiler (and
+        the operating system).
     -   Data are shared implicitly within the node through the Random
         Access Memory.
     -   MPI uses a distributed memory paradigm: Data are transferred
@@ -326,8 +342,12 @@ editor_options:
     `#pragma omp directive-name [clause[ [,] clause] ] new-line`
 -   Model (shared memory, threads, a "thread" runs on a "core")
 -   The serial and "parallel" (region) parts.
--   The "parallel for" loop: Loops without loop indices or while loop
-    are not supported by OpenMP
+-   The "parallel for" loop:
+    -   Loops without loop indices or while loop are not supported by
+        OpenMP
+    -   The end of a parallel for is always a barrier - `nowait`
+        directive not possible, because you are leaving a parallel
+        section at the end
 -   Synchronization between threads, for example "reduce" clause, or
     "atomic" or "critical" pragmas. Performance of each.
     -   reduce:
@@ -388,6 +408,9 @@ editor_options:
 ## MPI
 
 -   MPI uses a distributed memory paradigm
+    -   MPI is a multi-process model, for which communications between
+        processes are explicit and under the responsibility of the
+        programmer.
     -   Data are transferred explicitly between nodes through the
         network
     -   OpenMP uses a shared memory paradigm: Data are shared implicitly
@@ -618,6 +641,7 @@ editor_options:
 -   Data model: write once and read (process) multiple times, As is
     Google's business model
 -   What the "map" and "reduce" phases do.
+    -   `(for F in File?.txt; do cat $F | ./mapper.py; done) | sort | ./reducer.py > DIRECT.txt`
     -   Map phase:
         -   Read each line from input
         -   Remove leading/trailing spaces
@@ -665,7 +689,7 @@ editor_options:
     on GPUs.
 
     | Standard | Size              | Single (32 Bits, 4 Bytes) | Double (64 Bits, 8 Bytes) |
-    |------------------|------------------|--------------------------|-------------------------|
+    |----------|-------------------|---------------------------|---------------------------|
     | AVX      | 256 Bit, 32 Bytes | 8                         | 4                         |
     | AVX 512  | 512 Bit, 64 Bytes | 16                        | 8                         |
 
@@ -686,7 +710,7 @@ editor_options:
             introduces 256-bit and 512-bit vector registers
 
         -   With AVX, a single instruction might perform an operation
-            like adding two vectors of four single-precision
+            like adding two vectors of eight single-precision
             floating-point numbers in a single cycle.
     -   Warps:
         -   A warp is the basic unit of execution on a GPU, and all
@@ -755,7 +779,7 @@ editor_options:
     -   copyin - Allocate and copy to device
     -   copyout - Allocate space but do not initialize. Copy to host at
         the end
-        -   `#pragma acc data pcreate(x[0:N] ) pcopyout(y[:N])`
+        -   `#pragma acc data pcreate(x[0:N]) pcopyout(y[:N])`
         -   `y[:N]`: length is N
         -   `y[:N]` is equivalent to `y[0:N]`
     -   create - allocate space but do not initialize or copy back to
@@ -958,8 +982,8 @@ editor_options:
           double x;
           int index = threadId.x + blockId.x * blockDim.x;
           for(i=index, i<dx, i+= blockDim.x * gridDim.x){
-            x = (i+0.5)*step; 
-            sum[index] += 4.0/(1.0+x*x);
+            x = (i+0.5)*step; //Calculation of the x-coordinate for each iteration
+            sum[index] += 4.0/(1.0+x*x); //a numerical integration using the Monte Carlo method
           }
         } 
     ```
@@ -979,6 +1003,11 @@ editor_options:
         -   In effect, the entire grid of threads is jumping through the
             1-D array of data, a grid-width at a time. This topic is
             sometimes called a "grid-striding loop"
+
+        -   Each thread processes a subset of the total iterations
+            specified by `dx`, and the index is incremented by the total
+            number of threads in the grid (`blockDim.x * gridDim.x`) in
+            each iteration.
 
         -   Rather than assume that the thread grid is large enough to
             cover the entire data array, this kernel loops over the data
