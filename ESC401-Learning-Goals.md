@@ -517,9 +517,6 @@ Then:
         bool valid;
       }
 
-      //array of MPI datatypes
-      MPI_Datatype datatypes[] = {MPI_CHAR, MPI_INT, MPI_FLOAT, MPI_C_BOOL}; 
-      
       //number of elements for each MPI datatype
       int datacount[] = {5,1,3,1} 
       
@@ -529,6 +526,9 @@ Then:
       offsetof(particle, valid)
       }; 
       
+      //array of MPI datatypes
+      MPI_Datatype datatypes[] = {MPI_CHAR, MPI_INT, MPI_FLOAT, MPI_C_BOOL}; 
+
       //declares a variable named particle_type of type MPI_Datatype
       MPI_Datatype particle_type 
       
@@ -587,6 +587,7 @@ Then:
         -   In VMs, disk images and snapshots are typically managed
             through the hypervisor or virtualization platform
     -   mounting host directories for containers.
+        -   `docker run -it --run --mount type=bind,source=/Users/dpotter,target=/home ubuntu:20.04 /bin/bash`
     -   Also, we can create volumes for a VM, like plugging in a USB
         stick and that can be swapped to another VM.
 -   Example Docker File:
@@ -843,6 +844,17 @@ Then:
         a vector length of 32 and choose 32 blocks, we run 32\*32=1024
         Threads, which is half of the theoretical maximum of 2048.
 
+```         
+          #pragma acc parallel vector_length(32)
+          #pragma acc loop gang worker
+          for(int i=0; i<n; ++i){
+            #pragma acc loop vector
+            for(int j=0; j<m; ++j){
+              ...
+            }
+          }
+```
+
 -   Shared versus private variables.
 
     -   Private by default: scalars and loop index variables, not like
@@ -852,6 +864,13 @@ Then:
 -   Synchronization on the GPU, for example "reduce" clause, or "atomic"
     or "critical" pragmas. Performance of each.
 
+    -   An implicit synchronization happens when leaving a "kernels" or
+        "parallel" region
+    -   There is no implicit synchronization inside a parallel region
+        -   The order of loop execution is not preserved - indexes are
+            processed in any order
+    -   Loop execution order is preserved in the kernels construct
+        -   Each loop is a separate kernel invocation on the device
     -   Critical: worst.
         -   "implementing a barrier or critical section across workers
             or vector lanes using atomic
@@ -878,6 +897,8 @@ Then:
         -   `#pragma acc parallel loop async(1)`
     -   The wait(n) directive waits for all work in queue n to complete.
         -   `#praqma acc wait(1)`
+
+\newpage
 
 ```{=tex}
 \begin{figure}[ht!]
@@ -1006,8 +1027,8 @@ Then:
 
         -   Each thread processes a subset of the total iterations
             specified by `dx`, and the index is incremented by the total
-            number of threads in the grid (`blockDim.x * gridDim.x`) in
-            each iteration.
+            number of threads in the grid (\textcolor{blue}{blockDim.x}
+            `*` \textcolor{red}{gridDim.x}) in each iteration.
 
         -   Rather than assume that the thread grid is large enough to
             cover the entire data array, this kernel loops over the data
