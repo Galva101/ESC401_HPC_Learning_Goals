@@ -21,15 +21,12 @@ editor_options:
 
 ## Multiplication Table
 
-
 ```{=tex}
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=1.0\linewidth]{multiplication_table.pdf}
 \end{figure}
 ```
-
-
 ## Compilers and Queues
 
 -   Version control (e.g. "git"): clone, pull, add, commit, push.
@@ -176,7 +173,8 @@ Then:
 -   Test:
     -   `if test $A -gt 10; then echo large; fi` - a numerical
         comparison operator
-    -   `if [ $A -gt 10]; then echo large; fi` - conditional expressions
+    -   `if [ $A -gt 10 ]; then echo large; fi` - conditional
+        expressions
     -   `if [[ $A -gt 10 ]]; then echo large; fi` - string comparison
 -   For Loop:
     -   `for V in a b c; do echo $V; done`
@@ -222,6 +220,32 @@ Then:
       Time: 10.92
       Match: Phase 1 complete, 1.15 seconds
       Time: 1.15
+```
+
+-   Short Circuits:
+
+```         
+      Roman@MINGW64 ~/Desktop (main)
+      $ if echo first || echo second; then echo yes; fi
+      first
+      yes
+      
+      Roman@MINGW64 ~/Desktop (main)
+      $ if echo first || echo second  && echo third; then echo yes; fi
+      first
+      third
+      yes
+      
+      Roman@MINGW64 ~/Desktop (main)
+      $ if echo first || echo second; then echo yes; fi
+      first
+      yes
+      
+      Roman@MINGW64 ~/Desktop (main)
+      $ if false || echo second  && echo third; then echo yes; fi
+      second
+      third
+      yes
 ```
 
 \newpage
@@ -702,7 +726,7 @@ Then:
     on GPUs.
 
     | Standard | Size              | Single (32 Bits, 4 Bytes) | Double (64 Bits, 8 Bytes) |
-    |----------------|----------------|---------------------|---------------------|
+    |----------|-------------------|---------------------------|---------------------------|
     | AVX      | 256 Bit, 32 Bytes | 8                         | 4                         |
     | AVX 512  | 512 Bit, 64 Bytes | 16                        | 8                         |
 
@@ -847,16 +871,15 @@ Then:
         e.g. mapped to a Warp and executed at once.
 
     -   General rule: Use vectors for the inner loop, gangs and workers
-        for the outer. The maximum number of Blocks/Gangs per SM is 32. If we have
-        a vector length of 32 and choose 32 blocks, we run 32\*32=1024
-        Threads, which is half of the theoretical maximum of 2048 per SM.
-        Then we would have a 50% occupancy
-        
-        
-    -   Occupancy (number of active threads) is a measure of how
-        well threads handle latency. Occupancy is a indication of
-        efficiency, but not a direct measure of it. We can use
-        workers to help increase efficiency.
+        for the outer. The maximum number of Blocks/Gangs per SM is 32.
+        If we have a vector length of 32 and choose 32 blocks, we run
+        32\*32=1024 Threads, which is half of the theoretical maximum of
+        2048 per SM. Then we would have a 50% occupancy
+
+    -   Occupancy (number of active threads) is a measure of how well
+        threads handle latency. Occupancy is a indication of efficiency,
+        but not a direct measure of it. We can use workers to help
+        increase efficiency.
 
 ```         
           #pragma acc parallel vector_length(32)
