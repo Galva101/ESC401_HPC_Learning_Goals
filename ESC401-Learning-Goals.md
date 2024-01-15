@@ -12,11 +12,23 @@ header-includes:
 - \AtBeginDocument{\let\maketitle\relax}
 - \usepackage{xcolor}
 - \usepackage{placeins}
+- \usepackage{graphicx}
 papersize: a4
 editor_options: 
   markdown: 
     wrap: 72
 ---
+
+## Multiplication Table
+
+
+```{=tex}
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=1.0\linewidth]{multiplication_table.pdf}
+\end{figure}
+```
+
 
 ## Compilers and Queues
 
@@ -275,8 +287,8 @@ Then:
             executes system calls and other kernel-level operations on
             behalf of the program.
     -   `-g` flag:
-        -   tell GCC to emit extra information for use by a debugger
-        -   Allows for easier debugging with tools like GDB (GNU
+        -   tell `gcc` to emit extra information for use by a debugger
+        -   Allows for easier debugging with tools like `gdb` (GNU
             Debugger)
         -   Increases the size of the compiled binary.
     -   `-Og` flag:
@@ -593,7 +605,7 @@ Then:
 -   Example Docker File:
 
 ```         
-      FROM ubuntu:trusty
+      FROM ubuntu:trusty  
       
       RUN apt-get update -q && apt-get install -y -q --no-install-recomennds cowsay
       
@@ -690,7 +702,7 @@ Then:
     on GPUs.
 
     | Standard | Size              | Single (32 Bits, 4 Bytes) | Double (64 Bits, 8 Bytes) |
-    |----------|-------------------|---------------------------|---------------------------|
+    |----------------|----------------|---------------------|---------------------|
     | AVX      | 256 Bit, 32 Bytes | 8                         | 4                         |
     | AVX 512  | 512 Bit, 64 Bytes | 16                        | 8                         |
 
@@ -827,11 +839,6 @@ Then:
     -   Worker: An individual processing unit or entity responsible for
         performing a specific task. This is a collection of Vectors.
 
-        -   Occupancy (number of active threads) is a measure of how
-            well threads handle latency. Occupancy is a indication of
-            efficiency, but not a direct measure of it. We can use
-            workers to help increase efficiency.
-
     -   A gang is a pool of workers running on the same SM. This
         corresponds to a Cuda Block. Each SM can run at most 32
         Gangs/Blocks.
@@ -840,9 +847,16 @@ Then:
         e.g. mapped to a Warp and executed at once.
 
     -   General rule: Use vectors for the inner loop, gangs and workers
-        for the outer. The maximum number of threads is 2048. If we have
+        for the outer. The maximum number of Blocks/Gangs per SM is 32. If we have
         a vector length of 32 and choose 32 blocks, we run 32\*32=1024
-        Threads, which is half of the theoretical maximum of 2048.
+        Threads, which is half of the theoretical maximum of 2048 per SM.
+        Then we would have a 50% occupancy
+        
+        
+    -   Occupancy (number of active threads) is a measure of how
+        well threads handle latency. Occupancy is a indication of
+        efficiency, but not a direct measure of it. We can use
+        workers to help increase efficiency.
 
 ```         
           #pragma acc parallel vector_length(32)
