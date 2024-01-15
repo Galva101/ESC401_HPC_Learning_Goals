@@ -231,14 +231,14 @@ Then:
       yes
       
       Roman@MINGW64 ~/Desktop (main)
-      $ if echo first || echo second  && echo third; then echo yes; fi
+      $ if echo first || echo second || echo third; then echo yes; fi
       first
-      third
       yes
       
       Roman@MINGW64 ~/Desktop (main)
-      $ if echo first || echo second; then echo yes; fi
+      $ if echo first || echo second  && echo third; then echo yes; fi
       first
+      third
       yes
       
       Roman@MINGW64 ~/Desktop (main)
@@ -413,6 +413,7 @@ Then:
     -   Default: shared
         -   `#pragma omp parallel default(none) firstprivate(a)`
     -   Some variables are always private:
+        -   Loop indices are always private integer variables
         -   Local variables inside subroutines
         -   Variables declared in a parallel region
 -   How OpenMP schedules work between threads:
