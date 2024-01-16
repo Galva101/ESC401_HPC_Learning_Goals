@@ -27,6 +27,7 @@ editor_options:
 \includegraphics[width=1.0\linewidth]{multiplication_table.pdf}
 \end{figure}
 ```
+
 ## Compilers and Queues
 
 -   Version control (e.g. "git"): clone, pull, add, commit, push.
@@ -246,6 +247,12 @@ Then:
       second
       third
       yes
+      
+      Roman@MINGW64 ~/Desktop (main)
+      $  if ! echo first || echo second; then echo yes; fi
+      first
+      second
+      yes
 ```
 
 \newpage
@@ -346,7 +353,7 @@ Then:
 ## OpenMP
 
 -   OpenMP uses a shared memory paradigm
-    -   Open MP is a multithread model, within a single process.
+    -   OpenMP is a multithread model, within a single process.
         Communications between threads are implicit. The management of
         communications is under the responsibility of the compiler (and
         the operating system).
@@ -406,7 +413,7 @@ Then:
     -   critical:
         -   Order of execution is non-deterministic, but one thread at a
             time.
-        -   Less efficient that atomic for simple operations as it uses
+        -   Less efficient than atomic for simple operations as it uses
             locking instead of hardware support.
         -   `#pragma omp critical`
 -   Shared versus private variables:
@@ -423,7 +430,7 @@ Then:
         -   chunks of size N
         -   `#pragma omp for schedule(static,128)`
     -   `schedule(runtime)`
-        -   strategy is set at run time using the environment variable
+        -   strategy is set at runtime using the environment variable
             `OMP_SCHEDULE`
         -   `export OMP_SCHEDULE="guided, 16"`
         -   `#pragma omp for schedule(runtime)`
@@ -618,7 +625,7 @@ Then:
         access to the entire virtualized operating system
     -   The root user has full control over system resources, network
         configurations, and user accounts within the virtual machine
--   Dockerhub: like github but for containers.
+-   Dockerhub: like github but for containers
 -   How to access data
     -   images and snapshots for VMs
         -   In VMs, disk images and snapshots are typically managed
@@ -727,7 +734,7 @@ Then:
     on GPUs.
 
     | Standard | Size              | Single (32 Bits, 4 Bytes) | Double (64 Bits, 8 Bytes) |
-    |----------|-------------------|---------------------------|---------------------------|
+    |----------------|----------------|---------------------|---------------------|
     | AVX      | 256 Bit, 32 Bytes | 8                         | 4                         |
     | AVX 512  | 512 Bit, 64 Bytes | 16                        | 8                         |
 
@@ -850,7 +857,7 @@ Then:
 
 -   Difference between "kernels" construct and "parallel" construct.
 
-    -   Kernel: openacc should do its best on that. Is very
+    -   Kernel: OpenACC should do its best on that. Is very
         conservative.
     -   Parallel: We have to know that it is correct. Out of order could
         break stuff.
@@ -948,9 +955,9 @@ Then:
 
 ## CUDA
 
--   How to compile CUDA code (nvcc).
-    -   NVIDIA compiler (nvcc) separates host and device code
-    -   host code is passed to gcc
+-   How to compile CUDA code (`nvcc`).
+    -   NVIDIA compiler (`nvcc`) separates host and device code
+    -   host code is passed to `gcc`
     -   `nvcc hello_world.cu`
     -   `__global__` keyword is used to indicate that a function runs on
         the device
@@ -967,7 +974,9 @@ Then:
       cudaFree(a_d);                                        //free device variables
 ```
 
--   Kernels: `name<<< Blocks per Grid, Threads per Block>>>(...);`
+-   Kernels: 
+  - `name<<< Blocks per Grid, Threads per Block>>>(...);`
+  - Must be of return type `void`, they work by reference
 
 -   What a streaming multiprocessor (SM) is:
 
@@ -1083,5 +1092,11 @@ Then:
 \begin{figure}[ht!]
 \centering
 \includegraphics[width=0.6\linewidth]{blocks.png}
+\end{figure}
+```
+```{=tex}
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=1.0\linewidth]{cuda_kernels.pdf}
 \end{figure}
 ```
