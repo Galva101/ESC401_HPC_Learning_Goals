@@ -27,7 +27,6 @@ editor_options:
 \includegraphics[width=1.0\linewidth]{multiplication_table.pdf}
 \end{figure}
 ```
-
 ## Compilers and Queues
 
 -   Version control (e.g. "git"): clone, pull, add, commit, push.
@@ -734,7 +733,7 @@ Then:
     on GPUs.
 
     | Standard | Size              | Single (32 Bits, 4 Bytes) | Double (64 Bits, 8 Bytes) |
-    |----------------|----------------|---------------------|---------------------|
+    |----------|-------------------|---------------------------|---------------------------|
     | AVX      | 256 Bit, 32 Bytes | 8                         | 4                         |
     | AVX 512  | 512 Bit, 64 Bytes | 16                        | 8                         |
 
@@ -942,6 +941,11 @@ Then:
         -   `#pragma acc parallel loop async(1)`
     -   The wait(n) directive waits for all work in queue n to complete.
         -   `#praqma acc wait(1)`
+    -   They allow us to overlap computation and communication,
+        improving overall performance by reducing idle time.
+        Asynchronous data transfers and kernel launches can be initiated
+        without waiting for their completion, enabling the CPU to
+        continue with other tasks.
 
 \newpage
 
@@ -974,9 +978,10 @@ Then:
       cudaFree(a_d);                                        //free device variables
 ```
 
--   Kernels: 
-  - `name<<< Blocks per Grid, Threads per Block>>>(...);`
-  - Must be of return type `void`, they work by reference
+-   Kernels:
+
+    -   `name<<< Blocks per Grid, Threads per Block>>>(...);`
+    -   Must be of return type `void`, they work by reference
 
 -   What a streaming multiprocessor (SM) is:
 
